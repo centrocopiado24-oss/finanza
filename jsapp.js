@@ -24,6 +24,7 @@ let nominaTemporal = [];
 
 window.addEventListener('DOMContentLoaded', () => {
     const hoy = new Date().toISOString().split('T')[0];
+    
     const ingresoFecha = document.getElementById('ingresoFecha');
     if (ingresoFecha) ingresoFecha.value = hoy;
 
@@ -470,7 +471,7 @@ function confirmarPagoDeuda() {
         return;
     }
     if (!referencia) {
-        alert('️ Debes ingresar la referencia de pago');
+        alert('⚠️ Debes ingresar la referencia de pago');
         return;
     }
     
@@ -580,7 +581,7 @@ function guardarEmpleado() {
     const sueldo = parseFloat(document.getElementById('empleadoSueldo').value) || 0;
     
     if (!nombre) {
-        alert('️ Debes ingresar el nombre del empleado');
+        alert('⚠️ Debes ingresar el nombre del empleado');
         return;
     }
     if (!cedula) {
@@ -651,7 +652,7 @@ function guardarEdicionEmpleado() {
     const id = parseInt(document.getElementById('editEmpleadoID').value);
     const emp = DB.empleados.find(e => e.ID === id);
     if (!emp) {
-        alert(' Empleado no encontrado');
+        alert('❌ Empleado no encontrado');
         return;
     }
 
@@ -664,7 +665,7 @@ function guardarEdicionEmpleado() {
         return;
     }
     if (!cedula) {
-        alert('️ Debes ingresar la cédula');
+        alert('⚠️ Debes ingresar la cédula');
         return;
     }
     if (sueldo <= 0) {
@@ -748,7 +749,7 @@ function renderizarNominaPagos() {
             <td><input type="number" step="0.01" value="${emp.Deuda}" onchange="actualizarNetoNomina(${index}, this.value, 'deuda')" style="width:80px;padding:5px;"></td>
             <td><strong>$${emp.Neto.toFixed(2)}</strong></td>
             <td><input type="checkbox" ${emp.Pagado ? 'checked' : ''} onchange="togglePagoNomina(${index})"></td>
-            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">️</button></td>
+            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">🗑️</button></td>
         `;
         tbody.appendChild(tr);
         totalPagar += emp.Neto;
@@ -1105,7 +1106,7 @@ function cambiarEstadoGS(estado, texto) {
         txt.textContent = texto || 'Conectando...';
         dot.classList.add('estado-cargando');
     } else if (estado === 'error') {
-        dot.textContent = '️';
+        dot.textContent = '⚠️';
         txt.textContent = 'Error: ' + texto;
         GS_CONECTADO = false;
     }
@@ -1128,7 +1129,7 @@ async function verificarConexion() {
 function conectarGoogleSheets() {
     const url = document.getElementById('urlGoogleSheets').value.trim();
     if (!url) {
-        alert('️ Pega la URL de tu Apps Script (termina en /exec)');
+        alert('⚠️ Pega la URL de tu Apps Script (termina en /exec)');
         return;
     }
     if (!url.includes('/exec')) {
@@ -1153,7 +1154,7 @@ function desconectarGoogleSheets() {
 
 async function cargarDesdeSheets() {
     if (!GS_URL) {
-        alert('️ Primero conecta tu Google Sheet');
+        alert('⚠️ Primero conecta tu Google Sheet');
         return;
     }
     cambiarEstadoGS('cargando', 'Cargando datos...');
@@ -1215,6 +1216,6 @@ async function guardarEnSheets() {
         alert('✅ Datos guardados en Google Sheets correctamente');
     } catch (err) {
         cambiarEstadoGS('error', err.message);
-        alert(' Error al guardar: ' + err.message);
+        alert('❌ Error al guardar: ' + err.message);
     }
 }
