@@ -50,7 +50,7 @@
             <div class="subtitle">Hoy</div>
         </div>
         <div class="card card-blue">
-            <h3>💴 Total en Bolívares</h3>
+            <h3> Total en Bolívares</h3>
             <div class="amount" id="totalBS">Bs. 0.00</div>
             <div class="subtitle">Hoy</div>
         </div>
@@ -84,7 +84,7 @@
     <!-- INGRESOS -->
     <div id="ingresos" class="tab-content active">
         <div class="section">
-            <h2>📈 Registro de Ingresos (Cuadre de Caja)</h2>
+            <h2> Registro de Ingresos (Cuadre de Caja)</h2>
             <div class="form-grid">
                 <div class="form-group">
                     <label>📅 Fecha</label>
@@ -99,7 +99,7 @@
                     <input type="number" id="saldoIniUSD" step="0.01" value="0">
                 </div>
                 <div class="form-group">
-                    <label>💴 Saldo inicial Bs del día <span class="info-badge">i</span></label>
+                    <label> Saldo inicial Bs del día <span class="info-badge">i</span></label>
                     <input type="number" id="saldoIniBS" step="0.01" value="0">
                 </div>
             </div>
@@ -115,7 +115,7 @@
                     <input type="number" id="efectivoBS" step="0.01" value="0" onchange="calcularTotales()">
                 </div>
                 <div class="payment-card bs">
-                    <label>📱 Pago Móvil</label>
+                    <label> Pago Móvil</label>
                     <input type="number" id="pagoMovil" step="0.01" value="0" onchange="calcularTotales()">
                 </div>
                 <div class="payment-card both">
@@ -160,7 +160,7 @@
         </div>
 
         <div class="section">
-            <h2>📋 Historial de Ingresos</h2>
+            <h2> Historial de Ingresos</h2>
             <div class="table-responsive">
                 <table id="tablaIngresos">
                     <thead>
@@ -183,7 +183,7 @@
             <h2>🔔 Recordatorios</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>📅 Fecha Actual</label>
+                    <label> Fecha Actual</label>
                     <input type="date" id="recordatorioFechaActual" disabled>
                 </div>
                 <div class="form-group">
@@ -195,7 +195,7 @@
                     <input type="date" id="recordatorioFecha">
                 </div>
                 <div class="form-group">
-                    <label>📝 Descripción</label>
+                    <label> Descripción</label>
                     <input type="text" id="recordatorioDescripcion" placeholder="Ej: Pagar luz">
                 </div>
                 <div class="form-group">
@@ -215,11 +215,11 @@
                     <textarea id="recordatorioDetalle" rows="2"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>⚡ Prioridad</label>
+                    <label> Prioridad</label>
                     <select id="recordatorioPrioridad">
                         <option value="Alta">🔴 Alta</option>
                         <option value="Media" selected>🟡 Media</option>
-                        <option value="Baja">🟢 Baja</option>
+                        <option value="Baja"> Baja</option>
                     </select>
                 </div>
             </div>
@@ -247,7 +247,7 @@
         <div class="section">
             <h2>💳 Pagar - Proveedores / Deudas</h2>
             <div class="saldo-info">
-                📊 Saldo que quedó la última vez: USD: $<span id="ultimoSaldoUSD">0.00</span> | Bs: Bs. <span id="ultimoSaldoBS">0.00</span>
+                 Saldo que quedó la última vez: USD: $<span id="ultimoSaldoUSD">0.00</span> | Bs: Bs. <span id="ultimoSaldoBS">0.00</span>
             </div>
 
             <h3>🏦 Saldos en Cuentas</h3>
@@ -293,7 +293,7 @@
                     <input type="number" id="deudaMontoUSD" step="0.01" onchange="calcularMontoBSDeuda()">
                 </div>
                 <div class="form-group">
-                    <label>💴 Monto en Bs (calculado) <span class="info-badge">i</span></label>
+                    <label> Monto en Bs (calculado) <span class="info-badge">i</span></label>
                     <input type="text" id="deudaMontoBSCalculado" disabled>
                 </div>
                 <div class="form-group">
@@ -309,16 +309,16 @@
                     <label>⚡ Prioridad</label>
                     <select id="deudaPrioridad">
                         <option value="Alta">🔴 Alta</option>
-                        <option value="Media" selected>🟡 Media</option>
+                        <option value="Media" selected> Media</option>
                         <option value="Baja">🟢 Baja</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>🏦 Cuenta de origen del pago <span class="info-badge">i</span></label>
+                    <label> Cuenta de origen del pago <span class="info-badge">i</span></label>
                     <select id="deudaCuentaOrigen">
                         <option value="">-- Sin especificar --</option>
                         <option value="Binance">🪙 Cuenta Binance</option>
-                        <option value="Empresa">🏢 Cuenta Empresa</option>
+                        <option value="Empresa"> Cuenta Empresa</option>
                         <option value="Personal">👤 Cuenta Personal</option>
                     </select>
                 </div>
@@ -332,7 +332,7 @@
             <div class="saldo-info" style="margin-top: 20px;">
                 💸 Total Pendiente: $<span id="totalPendiente">0.00</span> | 
                 🔴 Prioridad Alta: $<span id="totalPrioridadAlta">0.00</span> | 
-                📋 Total Deudas: <span id="totalDeudas">0</span>
+                 Total Deudas: <span id="totalDeudas">0</span>
             </div>
         </div>
 
@@ -356,7 +356,7 @@
     <div id="nomina" class="tab-content">
         <div class="section">
             <h2>👥 Nómina</h2>
-            <h3>📋 Registro Empleados</h3>
+            <h3> Registro Empleados</h3>
             <div class="form-grid">
                 <div class="form-group">
                     <label>📅 Fecha Ingreso</label>
@@ -408,7 +408,7 @@
             <h2>🔍 Búsqueda General</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>📅 Desde</label>
+                    <label> Desde</label>
                     <input type="date" id="busqDesde">
                 </div>
                 <div class="form-group">
