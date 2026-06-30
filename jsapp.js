@@ -1,5 +1,5 @@
 // ============================================================
-// FinanzasPro v3.1 - Lógica Principal
+// FinanzasPro v3.1 - Lógica Principal COMPLETA
 // ============================================================
 
 // BASE DE DATOS LOCAL
@@ -29,18 +29,32 @@ let GS_CONECTADO = false;
 window.addEventListener('DOMContentLoaded', () => {
     // Fechas por defecto
     const hoy = new Date().toISOString().split('T')[0];
-    document.getElementById('ingresoFecha').value = hoy;
-    document.getElementById('recordatorioFechaActual').value = hoy;
-    document.getElementById('recordatorioFecha').value = hoy;
-    document.getElementById('deudaFecha').value = hoy;
-    document.getElementById('empleadoFecha').value = hoy;
+    
+    // Ingresos
+    const ingresoFecha = document.getElementById('ingresoFecha');
+    if (ingresoFecha) ingresoFecha.value = hoy;
+    
+    // Recordatorios
+    const recFechaActual = document.getElementById('recordatorioFechaActual');
+    if (recFechaActual) recFechaActual.value = hoy;
+    const recFecha = document.getElementById('recordatorioFecha');
+    if (recFecha) recFecha.value = hoy;
+    
+    // Deudas
+    const deudaFecha = document.getElementById('deudaFecha');
+    if (deudaFecha) deudaFecha.value = hoy;
+    
+    // Empleados
+    const empFecha = document.getElementById('empleadoFecha');
+    if (empFecha) empFecha.value = hoy;
 
     // Cargar datos locales
     cargarDesdeLocalStorage();
 
     // Auto-conectar a Google Sheets si hay URL guardada
     if (GS_URL) {
-        document.getElementById('urlGoogleSheets').value = GS_URL;
+        const urlInput = document.getElementById('urlGoogleSheets');
+        if (urlInput) urlInput.value = GS_URL;
         cambiarEstadoGS('cargando', 'Verificando conexión...');
         verificarConexion();
     }
@@ -142,6 +156,7 @@ function guardarIngreso() {
 
 function renderizarIngresos() {
     const tbody = document.querySelector('#tablaIngresos tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     DB.ingresos.forEach(ing => {
@@ -219,6 +234,7 @@ function guardarRecordatorio() {
 
 function renderizarRecordatorios() {
     const tbody = document.querySelector('#tablaRecordatorios tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     DB.recordatorios.forEach(rec => {
@@ -271,25 +287,38 @@ function limpiarRecordatorio() {
 }
 
 // ============================================================
-// DEUDAS / PAGAR
+// DEUDAS / PAGAR - ESTA ES LA FUNCIÓN QUE TE FALLA
 // ============================================================
 function guardarDeuda() {
+    // Validar campos obligatorios
+    const nombre = document.getElementById('deudaNombre').value.trim();
+    const montoUSD = parseFloat(document.getElementById('deudaMontoUSD').value) || 0;
+    
+    if (!nombre) {
+        alert('⚠️ Debes ingresar el nombre del proveedor');
+        return;
+    }
+    if (montoUSD <= 0) {
+        alert('⚠️ Debes ingresar un monto mayor a 0');
+        return;
+    }
+    
     const deuda = {
         ID: Date.now(),
         Fecha: document.getElementById('deudaFecha').value,
         TasaBCV: DB.config.TasaBCV,
         RIF: document.getElementById('deudaRIF').value,
-        Nombre: document.getElementById('deudaNombre').value,
+        Nombre: nombre,
         Descripcion: document.getElementById('deudaDescripcion').value,
         NroFactura: document.getElementById('deudaFactura').value,
-        MontoUSD: parseFloat(document.getElementById('deudaMontoUSD').value) || 0,
-        MontoBs: parseFloat(document.getElementById('deudaMontoBS').value) || 0,
+        MontoUSD: montoUSD,
+        MontoBs: parseFloat(document.getElementById('deudaMontoBS').value) || (montoUSD * DB.config.TasaBCV) || 0,
         Etiqueta: document.getElementById('deudaEtiqueta').value,
         Prioridad: document.getElementById('deudaPrioridad').value,
         CuentaOrigen: document.getElementById('deudaCuentaOrigen').value,
         Pagado: false,
         TotalAbonado: 0,
-        SaldoPendiente: parseFloat(document.getElementById('deudaMontoUSD').value) || 0
+        SaldoPendiente: montoUSD
     };
     
     DB.deudas.push(deuda);
@@ -302,13 +331,16 @@ function guardarDeuda() {
 
 function renderizarDeudas() {
     const tbody = document.querySelector('#tablaDeudas tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     let totalPendiente = 0;
     let totalPrioridadAlta = 0;
+    let deudasActivas = 0;
     
     DB.deudas.forEach(deuda => {
         if (!deuda.Pagado) {
+            deudasActivas++;
             totalPendiente += deuda.MontoUSD;
             if (deuda.Prioridad === 'Alta') totalPrioridadAlta += deuda.MontoUSD;
             
@@ -326,17 +358,22 @@ function renderizarDeudas() {
                 <td><span class="badge ${badgeClass}">${deuda.Prioridad}</span></td>
                 <td>${deuda.CuentaOrigen || '-'}</td>
                 <td>
-                    <button class="btn btn-success" onclick="marcarPagada(${deuda.ID})">💵</button>
-                    <button class="btn btn-danger" onclick="eliminarDeuda(${deuda.ID})">️</button>
+                    <button class="btn btn-success" onclick="marcarPagada(${deuda.ID})"></button>
+                    <button class="btn btn-danger" onclick="eliminarDeuda(${deuda.ID})">🗑️</button>
                 </td>
             `;
             tbody.appendChild(tr);
         }
     });
     
-    document.getElementById('totalPendiente').textContent = totalPendiente.toFixed(2);
-    document.getElementById('totalPrioridadAlta').textContent = totalPrioridadAlta.toFixed(2);
-    document.getElementById('totalDeudas').textContent = DB.deudas.filter(d => !d.Pagado).length;
+    const elTotalPendiente = document.getElementById('totalPendiente');
+    if (elTotalPendiente) elTotalPendiente.textContent = totalPendiente.toFixed(2);
+    
+    const elTotalAlta = document.getElementById('totalPrioridadAlta');
+    if (elTotalAlta) elTotalAlta.textContent = totalPrioridadAlta.toFixed(2);
+    
+    const elTotalDeudas = document.getElementById('totalDeudas');
+    if (elTotalDeudas) elTotalDeudas.textContent = deudasActivas;
 }
 
 function marcarPagada(id) {
@@ -400,6 +437,7 @@ function guardarEmpleado() {
 
 function renderizarEmpleados() {
     const tbody = document.querySelector('#tablaEmpleados tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     DB.empleados.forEach(emp => {
@@ -515,8 +553,10 @@ function actualizarDashboard() {
 // ============================================================
 function actualizarTasa() {
     DB.config.TasaBCV = parseFloat(document.getElementById('tasaBCV').value) || 0;
-    document.getElementById('recordatorioTasa').value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
-    document.getElementById('ingresoTasa').value = DB.config.TasaBCV;
+    const tasaInput = document.getElementById('recordatorioTasa');
+    if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+    const ingresoTasa = document.getElementById('ingresoTasa');
+    if (ingresoTasa) ingresoTasa.value = DB.config.TasaBCV;
     guardarEnLocalStorage();
 }
 
@@ -543,7 +583,8 @@ function cargarDesdeLocalStorage() {
     if (saved) {
         DB = JSON.parse(saved);
         document.getElementById('tasaBCV').value = DB.config.TasaBCV;
-        document.getElementById('recordatorioTasa').value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+        const tasaInput = document.getElementById('recordatorioTasa');
+        if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
         document.getElementById('nombreNegocio').value = DB.config.NombreNegocio;
         document.getElementById('saldoBinance').value = DB.config.SaldoBinance_USD;
         document.getElementById('saldoEmpresa').value = DB.config.SaldoEmpresa_USD;
@@ -581,7 +622,8 @@ function cargarExcel(event) {
         DB.empleados = leerHoja(wb, 'Empleados') || [];
         
         document.getElementById('tasaBCV').value = DB.config.TasaBCV;
-        document.getElementById('recordatorioTasa').value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+        const tasaInput = document.getElementById('recordatorioTasa');
+        if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
         document.getElementById('nombreNegocio').value = DB.config.NombreNegocio;
         document.getElementById('saldoBinance').value = DB.config.SaldoBinance_USD;
         document.getElementById('saldoEmpresa').value = DB.config.SaldoEmpresa_USD;
@@ -678,7 +720,7 @@ function cambiarEstadoGS(estado, texto) {
         txt.textContent = 'Desconectado - Pega tu URL para conectar';
         GS_CONECTADO = false;
     } else if (estado === 'cargando') {
-        dot.textContent = '';
+        dot.textContent = '🟡';
         txt.textContent = texto || 'Conectando...';
         dot.classList.add('estado-cargando');
     } else if (estado === 'error') {
@@ -772,7 +814,7 @@ async function cargarDesdeSheets() {
 
 async function guardarEnSheets() {
     if (!GS_URL) {
-        alert('️ Primero conecta tu Google Sheet');
+        alert('⚠️ Primero conecta tu Google Sheet');
         return;
     }
     
@@ -793,6 +835,6 @@ async function guardarEnSheets() {
         alert('✅ Datos guardados en Google Sheets correctamente');
     } catch (err) {
         cambiarEstadoGS('error', err.message);
-        alert('❌ Error al guardar: ' + err.message);
+        alert(' Error al guardar: ' + err.message);
     }
 }
