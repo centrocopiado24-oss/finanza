@@ -28,7 +28,7 @@
             <button onclick="cargarExcelBtn()" class="btn-secondary">Cargar Excel</button>
             <button onclick="guardarExcel()" class="btn-secondary">Guardar Excel</button>
             <button onclick="generarPDF()" class="btn-secondary">PDF</button>
-            <input type="hidden" id="inputExcel" onchange="cargarExcel(event)">
+            <input type="file" id="inputExcel" accept=".xlsx,.xls" style="display:none;" onchange="cargarExcel(event)">
         </div>
     </header>
 
