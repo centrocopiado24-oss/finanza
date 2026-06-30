@@ -1,7 +1,6 @@
 // ============================================================
 // FinanzasPro v3.1 - Lógica Principal COMPLETA
 // ============================================================
-
 let DB = {
     config: {
         TasaBCV: 0,
@@ -19,30 +18,26 @@ let DB = {
     nominaPagos: [],
     notas: ''
 };
-
 let GS_URL = localStorage.getItem('FinanzasPro_GS_URL') || '';
 let GS_CONECTADO = false;
-
-// Datos temporales para nómina
 let nominaTemporal = [];
 
 window.addEventListener('DOMContentLoaded', () => {
     const hoy = new Date().toISOString().split('T')[0];
-    
     const ingresoFecha = document.getElementById('ingresoFecha');
     if (ingresoFecha) ingresoFecha.value = hoy;
-    
+
     const recFechaActual = document.getElementById('recordatorioFechaActual');
     if (recFechaActual) recFechaActual.value = hoy;
     const recFecha = document.getElementById('recordatorioFecha');
     if (recFecha) recFecha.value = hoy;
-    
+
     const deudaFecha = document.getElementById('deudaFecha');
     if (deudaFecha) deudaFecha.value = hoy;
-    
+
     const empFecha = document.getElementById('empleadoFecha');
     if (empFecha) empFecha.value = hoy;
-    
+
     const nominaFecha = document.getElementById('nominaFechaPago');
     if (nominaFecha) nominaFecha.value = hoy;
 
@@ -72,7 +67,6 @@ function validarSaldoInicial() {
     const saldoUSD = parseFloat(document.getElementById('saldoIniUSD').value) || 0;
     const saldoBS = parseFloat(document.getElementById('saldoIniBS').value) || 0;
     const alerta = document.getElementById('alertaSaldoInicial');
-    
     if (saldoUSD === 0 && saldoBS === 0) {
         alerta.style.display = 'block';
         return false;
@@ -89,13 +83,12 @@ function calcularTotales() {
     const efectivoUSD = parseFloat(document.getElementById('efectivoUSD').value) || 0;
     const zelle = parseFloat(document.getElementById('zelle').value) || 0;
     const binance = parseFloat(document.getElementById('binance').value) || 0;
-    const tarjetaDebitoUSD = document.getElementById('tarjetaDebitoMoneda').value === 'USD' ? 
+    const tarjetaDebitoUSD = document.getElementById('tarjetaDebitoMoneda').value === 'USD' ?
         (parseFloat(document.getElementById('tarjetaDebito').value) || 0) : 0;
-    const tarjetaCreditoUSD = document.getElementById('tarjetaCreditoMoneda').value === 'USD' ? 
+    const tarjetaCreditoUSD = document.getElementById('tarjetaCreditoMoneda').value === 'USD' ?
         (parseFloat(document.getElementById('tarjetaCredito').value) || 0) : 0;
-    
     const totalUSD = efectivoUSD + zelle + binance + tarjetaDebitoUSD + tarjetaCreditoUSD;
-    
+
     const efectivoBS = parseFloat(document.getElementById('efectivoBS').value) || 0;
     const pagoMovil = parseFloat(document.getElementById('pagoMovil').value) || 0;
     const transferencia = parseFloat(document.getElementById('transferencia').value) || 0;
@@ -103,9 +96,9 @@ function calcularTotales() {
         (parseFloat(document.getElementById('tarjetaDebito').value) || 0) : 0;
     const tarjetaCreditoBS = document.getElementById('tarjetaCreditoMoneda').value === 'BS' ? 
         (parseFloat(document.getElementById('tarjetaCredito').value) || 0) : 0;
-    
+
     const totalBS = efectivoBS + pagoMovil + transferencia + tarjetaDebitoBS + tarjetaCreditoBS;
-    
+
     document.getElementById('totalUSD').textContent = '$' + totalUSD.toFixed(2);
     document.getElementById('totalBS').textContent = 'Bs. ' + totalBS.toFixed(2);
 }
@@ -126,13 +119,12 @@ function calcularMontoBSDeuda() {
 // INGRESOS
 // ============================================================
 function guardarIngreso() {
-    // Validar saldo inicial
     if (!validarSaldoInicial()) {
         alert('⚠️ Debes registrar el Saldo Inicial USD y/o Bs antes de guardar. Estos saldos representan el dinero que tienes en caja al inicio del día.');
         document.getElementById('saldoIniUSD').focus();
         return;
     }
-    
+
     const ingreso = {
         ID: Date.now(),
         Fecha: document.getElementById('ingresoFecha').value,
@@ -151,21 +143,21 @@ function guardarIngreso() {
         Binance_USD: parseFloat(document.getElementById('binance').value) || 0,
         Observacion: document.getElementById('observacion').value
     };
-    
+
     ingreso.Total_USD = ingreso.Efectivo_USD + ingreso.Zelle_USD + ingreso.Binance_USD + 
         (ingreso.TarjetaDebitoMoneda === 'USD' ? ingreso.TarjetaDebito : 0) +
         (ingreso.TarjetaCreditoMoneda === 'USD' ? ingreso.TarjetaCredito : 0);
-    
+
     ingreso.Total_Bs = ingreso.Efectivo_Bs + ingreso.PagoMovil_Bs + ingreso.Transferencia_Bs +
         (ingreso.TarjetaDebitoMoneda === 'BS' ? ingreso.TarjetaDebito : 0) +
         (ingreso.TarjetaCreditoMoneda === 'BS' ? ingreso.TarjetaCredito : 0);
-    
+
     ingreso.SaldoFin_USD = ingreso.SaldoIni_USD + ingreso.Total_USD;
     ingreso.SaldoFin_Bs = ingreso.SaldoIni_Bs + ingreso.Total_Bs;
-    
+
     DB.ingresos.push(ingreso);
     DB.config.TasaBCV = ingreso.TasaBCV;
-    
+
     guardarEnLocalStorage();
     renderizarIngresos();
     limpiarIngreso();
@@ -177,7 +169,6 @@ function renderizarIngresos() {
     const tbody = document.querySelector('#tablaIngresos tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     DB.ingresos.forEach(ing => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -197,11 +188,11 @@ function renderizarIngresos() {
             <td><strong>${ing.Total_Bs.toFixed(2)}</strong></td>
             <td>${ing.SaldoFin_USD.toFixed(2)}</td>
             <td>${ing.SaldoFin_Bs.toFixed(2)}</td>
-            <td><button class="btn btn-danger" onclick="eliminarIngreso(${ing.ID})">️</button></td>
+            <td><button class="btn btn-danger" onclick="eliminarIngreso(${ing.ID})">🗑️</button></td>
         `;
         tbody.appendChild(tr);
     });
-    
+
     document.getElementById('totalTransacciones').textContent = DB.ingresos.length;
 }
 
@@ -242,7 +233,7 @@ function guardarRecordatorio() {
         Prioridad: document.getElementById('recordatorioPrioridad').value,
         Completado: false
     };
-    
+
     DB.recordatorios.push(recordatorio);
     guardarEnLocalStorage();
     renderizarRecordatorios();
@@ -255,7 +246,6 @@ function renderizarRecordatorios() {
     const tbody = document.querySelector('#tablaRecordatorios tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     DB.recordatorios.forEach(rec => {
         const tr = document.createElement('tr');
         const badgeClass = rec.Prioridad === 'Alta' ? 'badge-high' : rec.Prioridad === 'Media' ? 'badge-medium' : 'badge-low';
@@ -306,7 +296,7 @@ function limpiarRecordatorio() {
 }
 
 // ============================================================
-// DEUDAS / PAGAR
+// DEUDAS / PAGAR - CON REFERENCIA DE PAGO
 // ============================================================
 function guardarDeuda() {
     const nombre = document.getElementById('deudaNombre').value.trim();
@@ -317,10 +307,10 @@ function guardarDeuda() {
         return;
     }
     if (montoUSD <= 0) {
-        alert('️ Debes ingresar un monto mayor a 0');
+        alert('⚠️ Debes ingresar un monto mayor a 0');
         return;
     }
-    
+
     const deuda = {
         ID: Date.now(),
         Fecha: document.getElementById('deudaFecha').value,
@@ -334,11 +324,12 @@ function guardarDeuda() {
         Etiqueta: document.getElementById('deudaEtiqueta').value,
         Prioridad: document.getElementById('deudaPrioridad').value,
         CuentaOrigen: document.getElementById('deudaCuentaOrigen').value,
+        ReferenciaPago: document.getElementById('deudaReferencia').value.trim(),
         Pagado: false,
         TotalAbonado: 0,
         SaldoPendiente: montoUSD
     };
-    
+
     DB.deudas.push(deuda);
     guardarEnLocalStorage();
     renderizarDeudas();
@@ -351,17 +342,16 @@ function renderizarDeudas() {
     const tbody = document.querySelector('#tablaDeudas tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     let totalPendiente = 0;
     let totalPrioridadAlta = 0;
     let deudasActivas = 0;
-    
+
     DB.deudas.forEach(deuda => {
         if (!deuda.Pagado) {
             deudasActivas++;
             totalPendiente += deuda.MontoUSD;
             if (deuda.Prioridad === 'Alta') totalPrioridadAlta += deuda.MontoUSD;
-            
+             
             const tr = document.createElement('tr');
             const badgeClass = deuda.Prioridad === 'Alta' ? 'badge-high' : deuda.Prioridad === 'Media' ? 'badge-medium' : 'badge-low';
             tr.innerHTML = `
@@ -375,6 +365,7 @@ function renderizarDeudas() {
                 <td>${deuda.Etiqueta}</td>
                 <td><span class="badge ${badgeClass}">${deuda.Prioridad}</span></td>
                 <td>${deuda.CuentaOrigen || '-'}</td>
+                <td>${deuda.ReferenciaPago || '-'}</td>
                 <td>
                     <button class="btn btn-success" onclick="marcarPagada(${deuda.ID})">💵</button>
                     <button class="btn btn-danger" onclick="eliminarDeuda(${deuda.ID})">🗑️</button>
@@ -383,13 +374,13 @@ function renderizarDeudas() {
             tbody.appendChild(tr);
         }
     });
-    
+
     const elTotalPendiente = document.getElementById('totalPendiente');
     if (elTotalPendiente) elTotalPendiente.textContent = totalPendiente.toFixed(2);
-    
+
     const elTotalAlta = document.getElementById('totalPrioridadAlta');
     if (elTotalAlta) elTotalAlta.textContent = totalPrioridadAlta.toFixed(2);
-    
+
     const elTotalDeudas = document.getElementById('totalDeudas');
     if (elTotalDeudas) elTotalDeudas.textContent = deudasActivas;
 }
@@ -422,6 +413,7 @@ function limpiarDeuda() {
     document.getElementById('deudaMontoUSD').value = '';
     document.getElementById('deudaMontoBSCalculado').value = '';
     document.getElementById('deudaCuentaOrigen').value = '';
+    document.getElementById('deudaReferencia').value = '';
 }
 
 function actualizarSaldosCuentas() {
@@ -451,7 +443,7 @@ function guardarEmpleado() {
         alert('⚠️ Debes ingresar un sueldo mayor a 0');
         return;
     }
-    
+
     const empleado = {
         ID: Date.now(),
         FechaIngreso: document.getElementById('empleadoFecha').value,
@@ -461,7 +453,7 @@ function guardarEmpleado() {
         SueldoUSD: sueldo,
         Status: 'Activo'
     };
-    
+
     DB.empleados.push(empleado);
     guardarEnLocalStorage();
     renderizarEmpleados();
@@ -474,7 +466,6 @@ function renderizarEmpleados() {
     const tbody = document.querySelector('#tablaEmpleados tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     DB.empleados.forEach(emp => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -504,43 +495,42 @@ function editarEmpleado(id) {
     document.getElementById('editEmpleadoTipoSueldo').value = emp.TipoSueldo;
     document.getElementById('editEmpleadoSueldo').value = emp.SueldoUSD;
     document.getElementById('editEmpleadoStatus').value = emp.Status;
-    
+
     document.getElementById('modalEditarEmpleado').style.display = 'flex';
 }
 
 function guardarEdicionEmpleado() {
     const id = parseInt(document.getElementById('editEmpleadoID').value);
     const emp = DB.empleados.find(e => e.ID === id);
-    
     if (!emp) {
         alert('❌ Empleado no encontrado');
         return;
     }
-    
+
     const nombre = document.getElementById('editEmpleadoNombre').value.trim();
     const cedula = document.getElementById('editEmpleadoCedula').value.trim();
     const sueldo = parseFloat(document.getElementById('editEmpleadoSueldo').value) || 0;
-    
+
     if (!nombre) {
         alert('⚠️ Debes ingresar el nombre');
         return;
     }
     if (!cedula) {
-        alert('️ Debes ingresar la cédula');
+        alert('⚠️ Debes ingresar la cédula');
         return;
     }
     if (sueldo <= 0) {
         alert('⚠️ Debes ingresar un sueldo mayor a 0');
         return;
     }
-    
+
     emp.FechaIngreso = document.getElementById('editEmpleadoFecha').value;
     emp.Nombre = nombre;
     emp.Cedula = cedula;
     emp.TipoSueldo = document.getElementById('editEmpleadoTipoSueldo').value;
     emp.SueldoUSD = sueldo;
     emp.Status = document.getElementById('editEmpleadoStatus').value;
-    
+
     guardarEnLocalStorage();
     renderizarEmpleados();
     actualizarDashboard();
@@ -568,16 +558,15 @@ function limpiarEmpleado() {
 }
 
 // ============================================================
-// NÓMINA - PAGAR Y REGISTRAR
+// NÓMINA - CON REFERENCIA DE PAGO
 // ============================================================
 function generarNomina() {
     const empleadosActivos = DB.empleados.filter(e => e.Status === 'Activo');
-    
     if (empleadosActivos.length === 0) {
         alert('⚠️ No hay empleados activos para pagar nómina');
         return;
     }
-    
+
     nominaTemporal = empleadosActivos.map(emp => ({
         ID: emp.ID,
         Nombre: emp.Nombre,
@@ -589,7 +578,7 @@ function generarNomina() {
         Neto: emp.SueldoUSD,
         Pagado: false
     }));
-    
+
     renderizarNominaPagos();
     document.getElementById('tablaNominaContainer').style.display = 'block';
 }
@@ -598,9 +587,8 @@ function renderizarNominaPagos() {
     const tbody = document.querySelector('#tablaNominaPagos tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     let totalPagar = 0;
-    
+
     nominaTemporal.forEach((emp, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -612,12 +600,12 @@ function renderizarNominaPagos() {
             <td><input type="number" step="0.01" value="${emp.Deuda}" onchange="actualizarNetoNomina(${index}, this.value, 'deuda')" style="width:80px;padding:5px;"></td>
             <td><strong>$${emp.Neto.toFixed(2)}</strong></td>
             <td><input type="checkbox" ${emp.Pagado ? 'checked' : ''} onchange="togglePagoNomina(${index})"></td>
-            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">️</button></td>
+            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">🗑️</button></td>
         `;
         tbody.appendChild(tr);
         totalPagar += emp.Neto;
     });
-    
+
     document.getElementById('totalNominaPagar').textContent = totalPagar.toFixed(2);
 }
 
@@ -644,24 +632,26 @@ function eliminarDeNomina(index) {
 function guardarNominaPagos() {
     const fechaPago = document.getElementById('nominaFechaPago').value;
     const cuentaOrigen = document.getElementById('nominaCuentaOrigen').value;
+    const referencia = document.getElementById('nominaReferencia').value.trim();
     
     if (!fechaPago) {
         alert('⚠️ Debes seleccionar la fecha de pago');
         return;
     }
-    
+
     const pagosRealizados = nominaTemporal.filter(e => e.Pagado);
-    
+
     if (pagosRealizados.length === 0) {
         alert('⚠️ Debes marcar al menos un empleado como pagado');
         return;
     }
-    
+
     pagosRealizados.forEach(emp => {
         const pago = {
             ID: Date.now() + Math.random(),
             FechaPago: fechaPago,
             CuentaOrigen: cuentaOrigen,
+            ReferenciaPago: referencia,
             Nombre: emp.Nombre,
             Cedula: emp.Cedula,
             Tipo: emp.TipoSueldo,
@@ -673,14 +663,15 @@ function guardarNominaPagos() {
         };
         DB.nominaPagos.push(pago);
     });
-    
+
     guardarEnLocalStorage();
     renderizarHistorialNomina();
     actualizarDashboard();
-    
+
     nominaTemporal = [];
     document.getElementById('tablaNominaContainer').style.display = 'none';
-    
+    document.getElementById('nominaReferencia').value = '';
+
     alert(`✅ Nómina pagada correctamente. ${pagosRealizados.length} empleado(s) registrado(s).`);
 }
 
@@ -688,6 +679,7 @@ function cancelarNomina() {
     if (confirm('¿Cancelar el pago de nómina?')) {
         nominaTemporal = [];
         document.getElementById('tablaNominaContainer').style.display = 'none';
+        document.getElementById('nominaReferencia').value = '';
     }
 }
 
@@ -695,7 +687,6 @@ function renderizarHistorialNomina() {
     const tbody = document.querySelector('#tablaHistorialNomina tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     DB.nominaPagos.forEach(pago => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -707,6 +698,7 @@ function renderizarHistorialNomina() {
             <td>$${pago.Deuda.toFixed(2)}</td>
             <td><strong>$${pago.Neto.toFixed(2)}</strong></td>
             <td>${pago.CuentaOrigen}</td>
+            <td>${pago.ReferenciaPago || '-'}</td>
             <td>✅ ${pago.Status}</td>
         `;
         tbody.appendChild(tr);
@@ -721,9 +713,8 @@ function realizarBusqueda() {
     const hasta = document.getElementById('busqHasta').value;
     const filtro = document.getElementById('busqFiltro').value;
     const texto = document.getElementById('busqTexto').value.toLowerCase();
-    
     let resultados = [];
-    
+
     if (filtro === 'todos' || filtro === 'ingresos') {
         DB.ingresos.forEach(ing => {
             if (desde && ing.Fecha < desde) return;
@@ -732,7 +723,7 @@ function realizarBusqueda() {
             resultados.push({ tipo: 'Ingreso', fecha: ing.Fecha, texto: `Total: $${ing.Total_USD} / Bs.${ing.Total_Bs}` });
         });
     }
-    
+
     if (filtro === 'todos' || filtro === 'deudas') {
         DB.deudas.forEach(d => {
             if (desde && d.Fecha < desde) return;
@@ -741,7 +732,7 @@ function realizarBusqueda() {
             resultados.push({ tipo: 'Deuda', fecha: d.Fecha, texto: `${d.Nombre} - $${d.MontoUSD}` });
         });
     }
-    
+
     if (filtro === 'todos' || filtro === 'recordatorios') {
         DB.recordatorios.forEach(r => {
             if (desde && r.FechaRecordatorio < desde) return;
@@ -750,7 +741,7 @@ function realizarBusqueda() {
             resultados.push({ tipo: 'Recordatorio', fecha: r.FechaRecordatorio, texto: r.Descripcion });
         });
     }
-    
+
     if (filtro === 'todos' || filtro === 'nomina') {
         DB.nominaPagos.forEach(p => {
             if (desde && p.FechaPago < desde) return;
@@ -759,7 +750,7 @@ function realizarBusqueda() {
             resultados.push({ tipo: 'Nómina', fecha: p.FechaPago, texto: `${p.Nombre} - $${p.Neto}` });
         });
     }
-    
+
     const cont = document.getElementById('resultadosBusqueda');
     if (resultados.length === 0) {
         cont.innerHTML = '<p style="padding:20px;text-align:center;color:#666;">Sin resultados</p>';
@@ -783,7 +774,7 @@ function actualizarDashboard() {
     const totalDeudas = DB.deudas.filter(d => !d.Pagado).reduce((sum, d) => sum + d.MontoUSD, 0);
     const totalNomina = DB.nominaPagos.reduce((sum, p) => sum + p.Neto, 0);
     const recordatoriosPendientes = DB.recordatorios.filter(r => !r.Completado).length;
-    
+
     document.getElementById('dashIngresos').textContent = `$${totalIngresosUSD.toFixed(2)} / Bs. ${totalIngresosBS.toFixed(2)}`;
     document.getElementById('dashDeudas').textContent = `$${totalDeudas.toFixed(2)}`;
     document.getElementById('dashNumDeudas').textContent = DB.deudas.filter(d => !d.Pagado).length;
@@ -855,7 +846,6 @@ function cargarExcelBtn() {
 function cargarExcel(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = (e) => {
         const data = new Uint8Array(e.target.result);
@@ -906,17 +896,16 @@ function leerHoja(wb, nombre) {
 
 function guardarExcel() {
     const wb = XLSX.utils.book_new();
-    
     const configArr = [['Clave','Valor']];
     Object.entries(DB.config).forEach(([k,v]) => configArr.push([k,v]));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(configArr), 'Config');
-    
+
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.ingresos), 'Ingresos');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.recordatorios), 'Recordatorios');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.deudas), 'Deudas');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.empleados), 'Empleados');
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.nominaPagos), 'NominaPagos');
-    
+
     const nombre = (DB.config.NombreNegocio || 'FinanzasPro').replace(/\s+/g,'_');
     XLSX.writeFile(wb, `${nombre}_${new Date().toISOString().split('T')[0]}.xlsx`);
 }
@@ -927,26 +916,25 @@ function guardarExcel() {
 function generarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
     doc.setFontSize(20);
     doc.text('FinanzasPro - Respaldo Diario', 14, 20);
-    
+
     doc.setFontSize(12);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 30);
     doc.text(`Negocio: ${DB.config.NombreNegocio}`, 14, 38);
     doc.text(`Tasa BCV: ${DB.config.TasaBCV}`, 14, 46);
-    
+
     const tableData = DB.ingresos.map(ing => [
         ing.Fecha, ing.Total_USD.toFixed(2), ing.Total_Bs.toFixed(2),
         ing.SaldoFin_USD.toFixed(2), ing.SaldoFin_Bs.toFixed(2)
     ]);
-    
+
     doc.autoTable({
         startY: 55,
         head: [['Fecha', 'Total USD', 'Total Bs', 'Saldo Final USD', 'Saldo Final Bs']],
         body: tableData,
     });
-    
+
     doc.save(`FinanzasPro_Respaldo_${new Date().toISOString().split('T')[0]}.pdf`);
     alert('✅ PDF generado');
 }
@@ -957,9 +945,8 @@ function generarPDF() {
 function cambiarEstadoGS(estado, texto) {
     const dot = document.getElementById('estadoGS');
     const txt = document.getElementById('textoEstadoGS');
-    
     dot.className = 'status-dot';
-    
+
     if (estado === 'conectado') {
         dot.textContent = '';
         txt.textContent = '✅ Cargado y Conectado';
@@ -996,14 +983,13 @@ async function verificarConexion() {
 function conectarGoogleSheets() {
     const url = document.getElementById('urlGoogleSheets').value.trim();
     if (!url) {
-        alert('️ Pega la URL de tu Apps Script (termina en /exec)');
+        alert('⚠️ Pega la URL de tu Apps Script (termina en /exec)');
         return;
     }
     if (!url.includes('/exec')) {
         alert('⚠️ La URL debe terminar en /exec');
         return;
     }
-    
     GS_URL = url;
     localStorage.setItem('FinanzasPro_GS_URL', url);
     cambiarEstadoGS('cargando', 'Conectando...');
@@ -1025,9 +1011,8 @@ async function cargarDesdeSheets() {
         alert('⚠️ Primero conecta tu Google Sheet');
         return;
     }
-    
     cambiarEstadoGS('cargando', 'Cargando datos...');
-    
+
     try {
         const res = await fetch(GS_URL + '?action=load');
         const data = await res.json();
@@ -1067,9 +1052,8 @@ async function guardarEnSheets() {
         alert('⚠️ Primero conecta tu Google Sheet');
         return;
     }
-    
     cambiarEstadoGS('cargando', 'Guardando en la nube...');
-    
+
     try {
         await fetch(GS_URL, {
             method: 'POST',
