@@ -17,7 +17,7 @@
         </div>
         <input type="text" id="urlGoogleSheets" placeholder="Pega aquí la URL /exec de tu Apps Script">
         <button onclick="conectarGoogleSheets()">Conectar</button>
-        <button onclick="cargarDesdeSheets()">📥 Cargar</button>
+        <button onclick="cargarDesdeSheets()"> Cargar</button>
         <button onclick="guardarEnSheets()">💾 Guardar</button>
         <button onclick="desconectarGoogleSheets()" class="btn-danger">❌</button>
     </div>
@@ -84,31 +84,27 @@
     <div id="tab-ingresos" class="tab-content active">
         <section class="section">
             <h2>📈 Registro de Ingresos (Cuadre de Caja)</h2>
-            
             <div id="alertaSaldoInicial" class="alerta-obligatorio" style="display:none;">
-                <strong>⚠️ ¡IMPORTANTE!</strong> Debes registrar el <strong>Saldo Inicial USD</strong> y <strong>Saldo Inicial Bs</strong> antes de guardar ingresos. 
-                Estos saldos representan el dinero que tienes en caja al inicio del día.
+                <strong>⚠️ ¡IMPORTANTE!</strong> Debes registrar el <strong>Saldo Inicial USD</strong> y <strong>Saldo Inicial Bs</strong> antes de guardar ingresos.
             </div>
-
             <div class="form-row">
                 <div class="form-group campo-obligatorio">
                     <label>📅 Fecha</label>
                     <input type="date" id="ingresoFecha">
                 </div>
                 <div class="form-group">
-                    <label>💱 Tasa BCV del día <small>(Se guarda estática)</small></label>
+                    <label>💱 Tasa BCV del día</label>
                     <input type="number" id="ingresoTasa" step="0.01" placeholder="Tasa">
                 </div>
                 <div class="form-group campo-obligatorio">
-                    <label>💵 Saldo inicial USD del día <span class="badge-required">OBLIGATORIO</span> <small>💰 Dinero en caja al inicio del día</small></label>
+                    <label>💵 Saldo inicial USD <span class="badge-required">OBLIGATORIO</span></label>
                     <input type="number" id="saldoIniUSD" step="0.01" placeholder="0.00" value="0">
                 </div>
                 <div class="form-group campo-obligatorio">
-                    <label>💴 Saldo inicial Bs del día <span class="badge-required">OBLIGATORIO</span> <small>💰 Dinero en caja al inicio del día</small></label>
+                    <label>💴 Saldo inicial Bs <span class="badge-required">OBLIGATORIO</span></label>
                     <input type="number" id="saldoIniBS" step="0.01" placeholder="0.00" value="0">
                 </div>
             </div>
-
             <h3>💳 Ventas por Métodos de Pago</h3>
             <div class="form-row">
                 <div class="form-group">
@@ -124,7 +120,6 @@
                     <input type="number" id="pagoMovil" step="0.01" placeholder="0.00" value="0" onchange="calcularTotales()">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>💳 Tarjeta Débito</label>
@@ -135,7 +130,7 @@
                     <input type="number" id="tarjetaDebito" step="0.01" placeholder="0.00" value="0" onchange="calcularTotales()">
                 </div>
                 <div class="form-group">
-                    <label>💳 Tarjeta Crédito</label>
+                    <label> Tarjeta Crédito</label>
                     <select id="tarjetaCreditoMoneda" onchange="calcularTotales()">
                         <option value="USD">USD</option>
                         <option value="BS">Bs</option>
@@ -147,7 +142,6 @@
                     <input type="number" id="transferencia" step="0.01" placeholder="0.00" value="0" onchange="calcularTotales()">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>Zelle (solo USD)</label>
@@ -158,41 +152,25 @@
                     <input type="number" id="binance" step="0.01" placeholder="0.00" value="0" onchange="calcularTotales()">
                 </div>
             </div>
-
             <div class="form-group">
                 <label>📝 Observación</label>
                 <textarea id="observacion" rows="2" placeholder="Notas adicionales..."></textarea>
             </div>
-
             <div class="form-actions">
                 <button onclick="guardarIngreso()" class="btn-primary">💾 Guardar Ingreso</button>
                 <button onclick="limpiarIngreso()" class="btn-secondary">🔄 Limpiar</button>
             </div>
         </section>
-
         <section class="section">
-            <h3>📋 Historial de Ingresos</h3>
+            <h3> Historial de Ingresos</h3>
             <div class="table-container">
                 <table id="tablaIngresos">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Tasa BCV</th>
-                            <th>Saldo Inicial $</th>
-                            <th>Saldo Inicial Bs</th>
-                            <th>Efectivo $</th>
-                            <th>Efectivo Bs</th>
-                            <th>Pago Móvil</th>
-                            <th>Débito</th>
-                            <th>Crédito</th>
-                            <th>Transf.</th>
-                            <th>Zelle</th>
-                            <th>Cripto</th>
-                            <th>Total $</th>
-                            <th>Total Bs</th>
-                            <th>Saldo Final $</th>
-                            <th>Saldo Final Bs</th>
-                            <th>Acciones</th>
+                            <th>Fecha</th><th>Tasa BCV</th><th>Saldo Inicial $</th><th>Saldo Inicial Bs</th>
+                            <th>Efectivo $</th><th>Efectivo Bs</th><th>Pago Móvil</th><th>Débito</th>
+                            <th>Crédito</th><th>Transf.</th><th>Zelle</th><th>Cripto</th>
+                            <th>Total $</th><th>Total Bs</th><th>Saldo Final $</th><th>Saldo Final Bs</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -215,7 +193,6 @@
                     <input type="text" id="recordatorioTasa" disabled placeholder="Bs. 0.00">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>📅 Fecha del recordatorio</label>
@@ -226,22 +203,20 @@
                     <input type="text" id="recordatorioDescripcion" placeholder="¿Qué debes recordar?">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>Monto en $</label>
                     <input type="number" id="recordatorioMontoUSD" step="0.01" placeholder="0.00" onchange="calcularMontoBSRecordatorio()">
                 </div>
                 <div class="form-group">
-                    <label>💴 Monto en Bs (calculado - solo informativo)</label>
+                    <label>💴 Monto en Bs (calculado)</label>
                     <input type="text" id="recordatorioMontoBSCalculado" disabled placeholder="Automático">
                 </div>
                 <div class="form-group">
-                    <label>💴 Monto en Bs (opcional - manual)</label>
+                    <label>💴 Monto en Bs (manual)</label>
                     <input type="number" id="recordatorioMontoBS" step="0.01" placeholder="0.00">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>🔍 Detalle</label>
@@ -256,26 +231,18 @@
                     </select>
                 </div>
             </div>
-
             <div class="form-actions">
                 <button onclick="guardarRecordatorio()" class="btn-primary">💾 Guardar Recordatorio</button>
             </div>
         </section>
-
         <section class="section">
             <h3>📋 Lista de Recordatorios</h3>
             <div class="table-container">
                 <table id="tablaRecordatorios">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Descripción</th>
-                            <th>Monto $</th>
-                            <th>Monto Bs</th>
-                            <th>Prioridad</th>
-                            <th>Detalle</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>Fecha</th><th>Descripción</th><th>Monto $</th><th>Monto Bs</th>
+                            <th>Prioridad</th><th>Detalle</th><th>Estado</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -288,16 +255,14 @@
     <div id="tab-deudas" class="tab-content">
         <section class="section">
             <h2>💳 Pagar - Proveedores / Deudas</h2>
-            
             <div class="saldos-info">
                 <p>📊 Saldo que quedó la última vez: USD: $<span id="saldoUltimoUSD">0.00</span> | Bs: Bs. <span id="saldoUltimoBS">0.00</span></p>
             </div>
-
             <div class="saldos-cuentas">
                 <h4>Saldos en Cuentas</h4>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>🪙 Cuenta Binance</label>
+                        <label> Cuenta Binance</label>
                         <input type="number" id="saldoBinance" step="0.01" placeholder="0.00" onchange="actualizarSaldosCuentas()">
                         <button onclick="document.getElementById('saldoBinance').value=''; actualizarSaldosCuentas();" class="btn-small">✏️</button>
                     </div>
@@ -317,7 +282,7 @@
             <h3>➕ Registrar Nueva Factura</h3>
             <div class="form-row">
                 <div class="form-group">
-                    <label>👤 Proveedor/Persona Existente</label>
+                    <label> Proveedor/Persona Existente</label>
                     <select id="deudaProveedorExistente" onchange="seleccionarProveedorExistente()">
                         <option value="">-- Nuevo Proveedor --</option>
                     </select>
@@ -328,7 +293,6 @@
                     <input type="date" id="deudaFecha">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>🏷️ RIF / Cédula</label>
@@ -339,7 +303,6 @@
                     <input type="text" id="deudaNombre" placeholder="Nombre del proveedor">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>📝 Descripción</label>
@@ -350,7 +313,6 @@
                     <input type="text" id="deudaFactura" placeholder="Nro factura">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>💵 Monto ($)</label>
@@ -365,7 +327,6 @@
                     <input type="number" id="deudaMontoBS" step="0.01" placeholder="0.00">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>🏷️ Etiqueta</label>
@@ -380,13 +341,13 @@
                 <div class="form-group">
                     <label>Prioridad</label>
                     <select id="deudaPrioridad">
-                        <option value="Alta">🔴 Alta</option>
+                        <option value="Alta"> Alta</option>
                         <option value="Media" selected>🟡 Media</option>
                         <option value="Baja">🟢 Baja</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>🏦 Cuenta de origen del pago <small>(¿De dónde saldrá el dinero?)</small></label>
+                    <label>🏦 Cuenta de origen del pago</label>
                     <select id="deudaCuentaOrigen">
                         <option value="">-- Sin especificar --</option>
                         <option value="Binance">🪙 Cuenta Binance</option>
@@ -395,16 +356,12 @@
                     </select>
                 </div>
             </div>
-
             <div class="form-actions">
                 <button onclick="guardarDeuda()" class="btn-primary">💾 Guardar Factura</button>
                 <button onclick="limpiarDeuda()" class="btn-secondary">🔄 Limpiar</button>
             </div>
-
             <div class="resumen-deudas">
-                <p>💸 Total Pendiente: $<span id="totalPendiente">0.00</span> | 
-                🔴 Prioridad Alta: $<span id="totalPrioridadAlta">0.00</span> | 
-                📋 Total Deudas: <span id="totalDeudas">0</span></p>
+                <p>💸 Total Pendiente: $<span id="totalPendiente">0.00</span> | 🔴 Prioridad Alta: $<span id="totalPrioridadAlta">0.00</span> | 📋 Total Deudas: <span id="totalDeudas">0</span></p>
             </div>
         </section>
 
@@ -414,19 +371,9 @@
                 <table id="tablaDeudas">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>RIF</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Factura</th>
-                            <th>Monto $</th>
-                            <th>Abonado $</th>
-                            <th>Saldo $</th>
-                            <th>Monto Bs</th>
-                            <th>Etiqueta</th>
-                            <th>Prioridad</th>
-                            <th>Cuenta</th>
-                            <th>Acciones</th>
+                            <th>Fecha</th><th>RIF</th><th>Nombre</th><th>Descripción</th><th>Factura</th>
+                            <th>Monto $</th><th>Abonado $</th><th>Saldo $</th><th>Monto Bs</th>
+                            <th>Etiqueta</th><th>Prioridad</th><th>Cuenta</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -440,7 +387,6 @@
         <div class="modal-content">
             <h2>💵 Registrar Pago/Abono</h2>
             <input type="hidden" id="pagoDeudaID">
-            
             <div class="form-group">
                 <label>Proveedor</label>
                 <input type="text" id="pagoDeudaNombre" disabled>
@@ -456,7 +402,7 @@
                 </div>
                 <div class="form-group">
                     <label>💵 Monto a Abonar ($)</label>
-                    <input type="number" id="pagoDeudaMonto" step="0.01" placeholder="0.00" onchange="calcularBsAbono()">
+                    <input type="number" id="pagoDeudaMonto" step="0.01" placeholder="0.00">
                 </div>
             </div>
             <div class="form-row">
@@ -475,13 +421,12 @@
             </div>
             <div class="form-group">
                 <label>🔖 Referencia de Pago</label>
-                <input type="text" id="pagoDeudaReferencia" placeholder="Ej: TRANSF-001, PAGO-MOVIL, EFECTIVO, etc.">
+                <input type="text" id="pagoDeudaReferencia" placeholder="Ej: TRANSF-001, PAGO-MOVIL, EFECTIVO">
             </div>
             <div class="form-group">
                 <label>📝 Observación</label>
                 <textarea id="pagoDeudaObservacion" rows="2" placeholder="Notas adicionales..."></textarea>
             </div>
-
             <div class="form-actions">
                 <button onclick="confirmarPagoDeuda()" class="btn-primary">💾 Confirmar Pago</button>
                 <button onclick="cerrarModalPago()" class="btn-danger">❌ Cancelar</button>
@@ -498,11 +443,7 @@
                 <table id="tablaHistorialPagosDeuda">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Monto $</th>
-                            <th>Cuenta</th>
-                            <th>Referencia</th>
-                            <th>Observación</th>
+                            <th>Fecha</th><th>Monto $</th><th>Cuenta</th><th>Referencia</th><th>Observación</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -517,12 +458,11 @@
     <!-- TAB NÓMINA -->
     <div id="tab-nomina" class="tab-content">
         <section class="section">
-            <h2>👥 Nómina</h2>
-            
+            <h2> Nómina</h2>
             <h3>📋 Registro Empleados</h3>
             <div class="form-row">
                 <div class="form-group">
-                    <label>📅 Fecha Ingreso</label>
+                    <label> Fecha Ingreso</label>
                     <input type="date" id="empleadoFecha">
                 </div>
                 <div class="form-group">
@@ -530,11 +470,10 @@
                     <input type="text" id="empleadoNombre" placeholder="Nombre completo">
                 </div>
                 <div class="form-group">
-                    <label>🆔 Cédula</label>
+                    <label> Cédula</label>
                     <input type="text" id="empleadoCedula" placeholder="V-12345678">
                 </div>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label>Tipo Sueldo</label>
@@ -550,32 +489,23 @@
                     <input type="number" id="empleadoSueldo" step="0.01" placeholder="0.00">
                 </div>
             </div>
-
             <div class="form-actions">
-                <button onclick="guardarEmpleado()" class="btn-primary">💾 Guardar Empleado</button>
+                <button onclick="guardarEmpleado()" class="btn-primary"> Guardar Empleado</button>
             </div>
         </section>
-
         <section class="section">
             <h3>Lista de Empleados</h3>
             <div class="table-container">
                 <table id="tablaEmpleados">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Nombre</th>
-                            <th>Cédula</th>
-                            <th>Tipo</th>
-                            <th>Sueldo</th>
-                            <th>Status</th>
-                            <th>Acciones</th>
+                            <th>Fecha</th><th>Nombre</th><th>Cédula</th><th>Tipo</th><th>Sueldo</th><th>Status</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
         </section>
-
         <section class="section">
             <h3>Pagar Nómina</h3>
             <div class="form-row">
@@ -584,32 +514,23 @@
                     <input type="date" id="nominaFechaPago">
                 </div>
                 <div class="form-group">
-                    <label>🏦 Cuenta de origen <small>(¿De qué cuenta pagarás?)</small></label>
+                    <label>🏦 Cuenta de origen</label>
                     <select id="nominaCuentaOrigen">
                         <option value="Empresa">🏢 Cuenta Empresa</option>
                         <option value="Binance">🪙 Cuenta Binance</option>
-                        <option value="Personal">👤 Cuenta Personal</option>
+                        <option value="Personal"> Cuenta Personal</option>
                     </select>
                 </div>
             </div>
-
             <button onclick="generarNomina()" class="btn-primary">🔄 Generar Nómina</button>
-
             <div id="tablaNominaContainer" style="display:none;">
                 <h3>📋 Detalle de Pago</h3>
                 <div class="table-container">
                     <table id="tablaNominaPagos">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Cédula</th>
-                                <th>Tipo</th>
-                                <th>Sueldo</th>
-                                <th>Bono ($)</th>
-                                <th>Deuda ($)</th>
-                                <th>Neto ($)</th>
-                                <th>Status</th>
-                                <th>Acción</th>
+                                <th>Nombre</th><th>Cédula</th><th>Tipo</th><th>Sueldo</th>
+                                <th>Bono ($)</th><th>Deuda ($)</th><th>Neto ($)</th><th>Status</th><th>Acción</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -617,27 +538,19 @@
                 </div>
                 <div class="form-actions">
                     <p>💰 Total a Pagar: $<span id="totalNominaPagar">0.00</span></p>
-                    <button onclick="guardarNominaPagos()" class="btn-primary">💾 Guardar y Pagar Todo</button>
+                    <button onclick="guardarNominaPagos()" class="btn-primary"> Guardar y Pagar Todo</button>
                     <button onclick="cancelarNomina()" class="btn-danger">❌ Cancelar</button>
                 </div>
             </div>
         </section>
-
         <section class="section">
             <h3>📜 Historial de Pagos de Nómina</h3>
             <div class="table-container">
                 <table id="tablaHistorialNomina">
                     <thead>
                         <tr>
-                            <th>Fecha Pago</th>
-                            <th>Empleado</th>
-                            <th>Cédula</th>
-                            <th>Sueldo</th>
-                            <th>Bono</th>
-                            <th>Deuda</th>
-                            <th>Neto</th>
-                            <th>Cuenta</th>
-                            <th>Status</th>
+                            <th>Fecha Pago</th><th>Empleado</th><th>Cédula</th><th>Sueldo</th>
+                            <th>Bono</th><th>Deuda</th><th>Neto</th><th>Cuenta</th><th>Status</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -656,28 +569,25 @@
                     <input type="date" id="busqDesde">
                 </div>
                 <div class="form-group">
-                    <label>📅 Hasta</label>
+                    <label> Hasta</label>
                     <input type="date" id="busqHasta">
                 </div>
                 <div class="form-group">
                     <label>Filtro Rápido</label>
                     <select id="busqFiltro">
                         <option value="todos">📊 Todos</option>
-                        <option value="ingresos">📈 Ingresos</option>
+                        <option value="ingresos"> Ingresos</option>
                         <option value="deudas">💳 Pagos</option>
                         <option value="nomina">👥 Nómina</option>
                         <option value="recordatorios">🔔 Recordatorios</option>
                     </select>
                 </div>
             </div>
-
             <div class="form-group">
                 <label>🔍 Buscar</label>
                 <input type="text" id="busqTexto" placeholder="Texto a buscar...">
             </div>
-
             <button onclick="realizarBusqueda()" class="btn-primary">🔍 Buscar</button>
-
             <div id="resultadosBusqueda" class="resultados"></div>
         </section>
     </div>
@@ -688,7 +598,7 @@
             <h2>📊 Dashboard General</h2>
             <div class="dashboard-grid">
                 <div class="card-dash">
-                    <h3>📈 INGRESOS DEL MES</h3>
+                    <h3> INGRESOS DEL MES</h3>
                     <p class="monto-grande" id="dashIngresos">$0.00 / Bs. 0.00</p>
                 </div>
                 <div class="card-dash">
@@ -713,7 +623,6 @@
                 </div>
             </div>
         </section>
-
         <section class="section">
             <h3>📝 Notas Rápidas</h3>
             <textarea id="notasRapidas" rows="5" placeholder="Escribe tus notas aquí..."></textarea>
@@ -726,7 +635,6 @@
         <div class="modal-content">
             <h2>✏️ Editar Empleado</h2>
             <input type="hidden" id="editEmpleadoID">
-            
             <div class="form-group">
                 <label>📅 Fecha Ingreso</label>
                 <input type="date" id="editEmpleadoFecha">
@@ -736,7 +644,7 @@
                 <input type="text" id="editEmpleadoNombre">
             </div>
             <div class="form-group">
-                <label>🆔 Cédula</label>
+                <label> Cédula</label>
                 <input type="text" id="editEmpleadoCedula">
             </div>
             <div class="form-group">
@@ -759,7 +667,6 @@
                     <option value="Inactivo">Inactivo</option>
                 </select>
             </div>
-
             <div class="form-actions">
                 <button onclick="guardarEdicionEmpleado()" class="btn-primary">💾 Guardar Cambios</button>
                 <button onclick="cerrarModalEmpleado()" class="btn-danger">❌ Cancelar</button>
