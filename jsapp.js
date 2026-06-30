@@ -115,10 +115,6 @@ function calcularMontoBSDeuda() {
     document.getElementById('deudaMontoBSCalculado').value = (montoUSD * tasa).toFixed(2);
 }
 
-function calcularBsAbono() {
-    // Solo informativo, no se guarda
-}
-
 // ============================================================
 // INGRESOS
 // ============================================================
@@ -192,11 +188,10 @@ function renderizarIngresos() {
             <td><strong>${ing.Total_Bs.toFixed(2)}</strong></td>
             <td>${ing.SaldoFin_USD.toFixed(2)}</td>
             <td>${ing.SaldoFin_Bs.toFixed(2)}</td>
-            <td><button class="btn btn-danger" onclick="eliminarIngreso(${ing.ID})">️</button></td>
+            <td><button class="btn btn-danger" onclick="eliminarIngreso(${ing.ID})">🗑️</button></td>
         `;
         tbody.appendChild(tr);
     });
-
     document.getElementById('totalTransacciones').textContent = DB.ingresos.length;
 }
 
@@ -237,7 +232,6 @@ function guardarRecordatorio() {
         Prioridad: document.getElementById('recordatorioPrioridad').value,
         Completado: false
     };
-
     DB.recordatorios.push(recordatorio);
     guardarEnLocalStorage();
     renderizarRecordatorios();
@@ -265,7 +259,7 @@ function renderizarRecordatorios() {
                 <button class="btn btn-${rec.Completado ? 'warning' : 'success'}" onclick="toggleRecordatorio(${rec.ID})">
                     ${rec.Completado ? '↩️' : '✅'}
                 </button>
-                <button class="btn btn-danger" onclick="eliminarRecordatorio(${rec.ID})">️</button>
+                <button class="btn btn-danger" onclick="eliminarRecordatorio(${rec.ID})">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -327,8 +321,9 @@ function actualizarListaProveedores() {
     const nombresVistos = new Set();
     
     DB.deudas.forEach(d => {
-        if (!nombresVistos.has(d.Nombre.toLowerCase())) {
-            nombresVistos.add(d.Nombre.toLowerCase());
+        const clave = (d.Nombre || '').toLowerCase().trim();
+        if (clave && !nombresVistos.has(clave)) {
+            nombresVistos.add(clave);
             proveedoresUnicos.push(d);
         }
     });
@@ -471,11 +466,11 @@ function confirmarPagoDeuda() {
         return;
     }
     if (!fechaPago) {
-        alert('️ Debes seleccionar la fecha de pago');
+        alert('⚠️ Debes seleccionar la fecha de pago');
         return;
     }
     if (!referencia) {
-        alert('⚠️ Debes ingresar la referencia de pago');
+        alert('️ Debes ingresar la referencia de pago');
         return;
     }
     
@@ -577,7 +572,7 @@ function actualizarSaldosCuentas() {
 }
 
 // ============================================================
-// EMPLEADOS - CON EDICIÓN
+// EMPLEADOS
 // ============================================================
 function guardarEmpleado() {
     const nombre = document.getElementById('empleadoNombre').value.trim();
@@ -585,7 +580,7 @@ function guardarEmpleado() {
     const sueldo = parseFloat(document.getElementById('empleadoSueldo').value) || 0;
     
     if (!nombre) {
-        alert('⚠️ Debes ingresar el nombre del empleado');
+        alert('️ Debes ingresar el nombre del empleado');
         return;
     }
     if (!cedula) {
@@ -656,7 +651,7 @@ function guardarEdicionEmpleado() {
     const id = parseInt(document.getElementById('editEmpleadoID').value);
     const emp = DB.empleados.find(e => e.ID === id);
     if (!emp) {
-        alert('❌ Empleado no encontrado');
+        alert(' Empleado no encontrado');
         return;
     }
 
@@ -753,7 +748,7 @@ function renderizarNominaPagos() {
             <td><input type="number" step="0.01" value="${emp.Deuda}" onchange="actualizarNetoNomina(${index}, this.value, 'deuda')" style="width:80px;padding:5px;"></td>
             <td><strong>$${emp.Neto.toFixed(2)}</strong></td>
             <td><input type="checkbox" ${emp.Pagado ? 'checked' : ''} onchange="togglePagoNomina(${index})"></td>
-            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">🗑️</button></td>
+            <td><button class="btn btn-danger" onclick="eliminarDeNomina(${index})">️</button></td>
         `;
         tbody.appendChild(tr);
         totalPagar += emp.Neto;
@@ -798,4 +793,428 @@ function guardarNominaPagos() {
         return;
     }
 
-    pagosRealizados.forEach
+    pagosRealizados.forEach(emp => {
+        const pago = {
+            ID: Date.now() + Math.random(),
+            FechaPago: fechaPago,
+            CuentaOrigen: cuentaOrigen,
+            Nombre: emp.Nombre,
+            Cedula: emp.Cedula,
+            Tipo: emp.TipoSueldo,
+            Sueldo: emp.Sueldo,
+            Bono: emp.Bono,
+            Deuda: emp.Deuda,
+            Neto: emp.Neto,
+            Status: 'Pagado'
+        };
+        DB.nominaPagos.push(pago);
+    });
+
+    guardarEnLocalStorage();
+    renderizarHistorialNomina();
+    actualizarDashboard();
+
+    nominaTemporal = [];
+    document.getElementById('tablaNominaContainer').style.display = 'none';
+
+    alert(`✅ Nómina pagada correctamente. ${pagosRealizados.length} empleado(s) registrado(s).`);
+}
+
+function cancelarNomina() {
+    if (confirm('¿Cancelar el pago de nómina?')) {
+        nominaTemporal = [];
+        document.getElementById('tablaNominaContainer').style.display = 'none';
+    }
+}
+
+function renderizarHistorialNomina() {
+    const tbody = document.querySelector('#tablaHistorialNomina tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    DB.nominaPagos.forEach(pago => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${pago.FechaPago}</td>
+            <td>${pago.Nombre}</td>
+            <td>${pago.Cedula}</td>
+            <td>$${pago.Sueldo.toFixed(2)}</td>
+            <td>$${pago.Bono.toFixed(2)}</td>
+            <td>$${pago.Deuda.toFixed(2)}</td>
+            <td><strong>$${pago.Neto.toFixed(2)}</strong></td>
+            <td>${pago.CuentaOrigen}</td>
+            <td>✅ ${pago.Status}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ============================================================
+// BÚSQUEDA
+// ============================================================
+function realizarBusqueda() {
+    const desde = document.getElementById('busqDesde').value;
+    const hasta = document.getElementById('busqHasta').value;
+    const filtro = document.getElementById('busqFiltro').value;
+    const texto = document.getElementById('busqTexto').value.toLowerCase();
+    let resultados = [];
+
+    if (filtro === 'todos' || filtro === 'ingresos') {
+        DB.ingresos.forEach(ing => {
+            if (desde && ing.Fecha < desde) return;
+            if (hasta && ing.Fecha > hasta) return;
+            if (texto && !JSON.stringify(ing).toLowerCase().includes(texto)) return;
+            resultados.push({ tipo: 'Ingreso', fecha: ing.Fecha, texto: `Total: $${ing.Total_USD} / Bs.${ing.Total_Bs}` });
+        });
+    }
+
+    if (filtro === 'todos' || filtro === 'deudas') {
+        DB.deudas.forEach(d => {
+            if (desde && d.Fecha < desde) return;
+            if (hasta && d.Fecha > hasta) return;
+            if (texto && !JSON.stringify(d).toLowerCase().includes(texto)) return;
+            resultados.push({ tipo: 'Deuda', fecha: d.Fecha, texto: `${d.Nombre} - $${d.MontoUSD}` });
+        });
+    }
+
+    if (filtro === 'todos' || filtro === 'recordatorios') {
+        DB.recordatorios.forEach(r => {
+            if (desde && r.FechaRecordatorio < desde) return;
+            if (hasta && r.FechaRecordatorio > hasta) return;
+            if (texto && !JSON.stringify(r).toLowerCase().includes(texto)) return;
+            resultados.push({ tipo: 'Recordatorio', fecha: r.FechaRecordatorio, texto: r.Descripcion });
+        });
+    }
+
+    if (filtro === 'todos' || filtro === 'nomina') {
+        DB.nominaPagos.forEach(p => {
+            if (desde && p.FechaPago < desde) return;
+            if (hasta && p.FechaPago > hasta) return;
+            if (texto && !JSON.stringify(p).toLowerCase().includes(texto)) return;
+            resultados.push({ tipo: 'Nómina', fecha: p.FechaPago, texto: `${p.Nombre} - $${p.Neto}` });
+        });
+    }
+
+    const cont = document.getElementById('resultadosBusqueda');
+    if (resultados.length === 0) {
+        cont.innerHTML = '<p style="padding:20px;text-align:center;color:#666;">Sin resultados</p>';
+    } else {
+        cont.innerHTML = `<p style="padding:10px;font-weight:600;">${resultados.length} resultado(s) encontrado(s)</p>` +
+            resultados.map(r => `
+                <div style="padding:10px;background:white;margin:5px 0;border-radius:6px;border-left:4px solid #667eea;">
+                    <strong>${r.tipo}</strong> - ${r.fecha}<br>
+                    ${r.texto}
+                </div>
+            `).join('');
+    }
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function actualizarDashboard() {
+    const totalIngresosUSD = DB.ingresos.reduce((sum, ing) => sum + ing.Total_USD, 0);
+    const totalIngresosBS = DB.ingresos.reduce((sum, ing) => sum + ing.Total_Bs, 0);
+    const totalDeudas = DB.deudas.filter(d => !d.Pagado).reduce((sum, d) => sum + d.SaldoPendiente, 0);
+    const totalNomina = DB.nominaPagos.reduce((sum, p) => sum + p.Neto, 0);
+    const recordatoriosPendientes = DB.recordatorios.filter(r => !r.Completado).length;
+
+    document.getElementById('dashIngresos').textContent = `$${totalIngresosUSD.toFixed(2)} / Bs. ${totalIngresosBS.toFixed(2)}`;
+    document.getElementById('dashDeudas').textContent = `$${totalDeudas.toFixed(2)}`;
+    document.getElementById('dashNumDeudas').textContent = DB.deudas.filter(d => !d.Pagado).length;
+    document.getElementById('dashNomina').textContent = `$${totalNomina.toFixed(2)}`;
+    document.getElementById('dashNumEmpleados').textContent = DB.empleados.length;
+    document.getElementById('dashRecordatorios').textContent = recordatoriosPendientes;
+    document.getElementById('dashBalance').textContent = `$${(totalIngresosUSD - totalDeudas - totalNomina).toFixed(2)}`;
+}
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+function actualizarTasa() {
+    DB.config.TasaBCV = parseFloat(document.getElementById('tasaBCV').value) || 0;
+    const tasaInput = document.getElementById('recordatorioTasa');
+    if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+    const ingresoTasa = document.getElementById('ingresoTasa');
+    if (ingresoTasa) ingresoTasa.value = DB.config.TasaBCV;
+    guardarEnLocalStorage();
+}
+
+function actualizarNegocio() {
+    DB.config.NombreNegocio = document.getElementById('nombreNegocio').value;
+    guardarEnLocalStorage();
+}
+
+function guardarNotas() {
+    DB.notas = document.getElementById('notasRapidas').value;
+    guardarEnLocalStorage();
+    alert('✅ Notas guardadas');
+}
+
+// ============================================================
+// LOCAL STORAGE
+// ============================================================
+function guardarEnLocalStorage() {
+    localStorage.setItem('FinanzasProDB', JSON.stringify(DB));
+}
+
+function cargarDesdeLocalStorage() {
+    const saved = localStorage.getItem('FinanzasProDB');
+    if (saved) {
+        DB = JSON.parse(saved);
+        document.getElementById('tasaBCV').value = DB.config.TasaBCV;
+        const tasaInput = document.getElementById('recordatorioTasa');
+        if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+        document.getElementById('nombreNegocio').value = DB.config.NombreNegocio;
+        document.getElementById('saldoBinance').value = DB.config.SaldoBinance_USD;
+        document.getElementById('saldoEmpresa').value = DB.config.SaldoEmpresa_USD;
+        document.getElementById('saldoPersonal').value = DB.config.SaldoPersonal_USD;
+        document.getElementById('notasRapidas').value = DB.notas || '';
+        
+        renderizarIngresos();
+        renderizarRecordatorios();
+        renderizarDeudas();
+        renderizarEmpleados();
+        renderizarHistorialNomina();
+        actualizarDashboard();
+        actualizarListaProveedores();
+    }
+}
+
+// ============================================================
+// EXCEL
+// ============================================================
+function cargarExcelBtn() {
+    document.getElementById('inputExcel').click();
+}
+
+function cargarExcel(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, {type:'array'});
+        
+        DB.config = leerHojaConfig(wb, 'Config') || DB.config;
+        DB.ingresos = leerHoja(wb, 'Ingresos') || [];
+        DB.recordatorios = leerHoja(wb, 'Recordatorios') || [];
+        DB.deudas = leerHoja(wb, 'Deudas') || [];
+        DB.empleados = leerHoja(wb, 'Empleados') || [];
+        DB.nominaPagos = leerHoja(wb, 'NominaPagos') || [];
+        
+        document.getElementById('tasaBCV').value = DB.config.TasaBCV;
+        const tasaInput = document.getElementById('recordatorioTasa');
+        if (tasaInput) tasaInput.value = 'Bs. ' + DB.config.TasaBCV.toFixed(2);
+        document.getElementById('nombreNegocio').value = DB.config.NombreNegocio;
+        document.getElementById('saldoBinance').value = DB.config.SaldoBinance_USD;
+        document.getElementById('saldoEmpresa').value = DB.config.SaldoEmpresa_USD;
+        document.getElementById('saldoPersonal').value = DB.config.SaldoPersonal_USD;
+        
+        guardarEnLocalStorage();
+        renderizarIngresos();
+        renderizarRecordatorios();
+        renderizarDeudas();
+        renderizarEmpleados();
+        renderizarHistorialNomina();
+        actualizarDashboard();
+        actualizarListaProveedores();
+        
+        alert('✅ Excel cargado: ' + file.name);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function leerHojaConfig(wb, nombre) {
+    if (!wb.SheetNames.includes(nombre)) return {};
+    const sheet = wb.Sheets[nombre];
+    const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+    const obj = {};
+    json.forEach(r => obj[r.Clave] = r.Valor);
+    return obj;
+}
+
+function leerHoja(wb, nombre) {
+    if (!wb.SheetNames.includes(nombre)) return [];
+    const sheet = wb.Sheets[nombre];
+    return XLSX.utils.sheet_to_json(sheet, {defval:''});
+}
+
+function guardarExcel() {
+    const wb = XLSX.utils.book_new();
+    const configArr = [['Clave','Valor']];
+    Object.entries(DB.config).forEach(([k,v]) => configArr.push([k,v]));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(configArr), 'Config');
+
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.ingresos), 'Ingresos');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.recordatorios), 'Recordatorios');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.deudas), 'Deudas');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.empleados), 'Empleados');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DB.nominaPagos), 'NominaPagos');
+
+    const nombre = (DB.config.NombreNegocio || 'FinanzasPro').replace(/\s+/g,'_');
+    XLSX.writeFile(wb, `${nombre}_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+// ============================================================
+// PDF
+// ============================================================
+function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text('FinanzasPro - Respaldo Diario', 14, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Negocio: ${DB.config.NombreNegocio}`, 14, 38);
+    doc.text(`Tasa BCV: ${DB.config.TasaBCV}`, 14, 46);
+
+    const tableData = DB.ingresos.map(ing => [
+        ing.Fecha, ing.Total_USD.toFixed(2), ing.Total_Bs.toFixed(2),
+        ing.SaldoFin_USD.toFixed(2), ing.SaldoFin_Bs.toFixed(2)
+    ]);
+
+    doc.autoTable({
+        startY: 55,
+        head: [['Fecha', 'Total USD', 'Total Bs', 'Saldo Final USD', 'Saldo Final Bs']],
+        body: tableData,
+    });
+
+    doc.save(`FinanzasPro_Respaldo_${new Date().toISOString().split('T')[0]}.pdf`);
+    alert('✅ PDF generado');
+}
+
+// ============================================================
+// GOOGLE SHEETS
+// ============================================================
+function cambiarEstadoGS(estado, texto) {
+    const dot = document.getElementById('estadoGS');
+    const txt = document.getElementById('textoEstadoGS');
+    dot.className = 'status-dot';
+
+    if (estado === 'conectado') {
+        dot.textContent = '';
+        txt.textContent = '✅ Cargado y Conectado';
+        GS_CONECTADO = true;
+    } else if (estado === 'desconectado') {
+        dot.textContent = '';
+        txt.textContent = 'Desconectado - Pega tu URL para conectar';
+        GS_CONECTADO = false;
+    } else if (estado === 'cargando') {
+        dot.textContent = '🟡';
+        txt.textContent = texto || 'Conectando...';
+        dot.classList.add('estado-cargando');
+    } else if (estado === 'error') {
+        dot.textContent = '️';
+        txt.textContent = 'Error: ' + texto;
+        GS_CONECTADO = false;
+    }
+}
+
+async function verificarConexion() {
+    try {
+        const res = await fetch(GS_URL + '?action=status');
+        const data = await res.json();
+        if (data.success) {
+            cambiarEstadoGS('conectado');
+        } else {
+            cambiarEstadoGS('error', 'URL no válida');
+        }
+    } catch (err) {
+        cambiarEstadoGS('error', 'No se puede conectar');
+    }
+}
+
+function conectarGoogleSheets() {
+    const url = document.getElementById('urlGoogleSheets').value.trim();
+    if (!url) {
+        alert('️ Pega la URL de tu Apps Script (termina en /exec)');
+        return;
+    }
+    if (!url.includes('/exec')) {
+        alert('⚠️ La URL debe terminar en /exec');
+        return;
+    }
+    GS_URL = url;
+    localStorage.setItem('FinanzasPro_GS_URL', url);
+    cambiarEstadoGS('cargando', 'Conectando...');
+    verificarConexion();
+}
+
+function desconectarGoogleSheets() {
+    if (confirm('¿Desconectar de Google Sheets? Los datos locales seguirán guardados.')) {
+        GS_URL = '';
+        GS_CONECTADO = false;
+        localStorage.removeItem('FinanzasPro_GS_URL');
+        document.getElementById('urlGoogleSheets').value = '';
+        cambiarEstadoGS('desconectado');
+    }
+}
+
+async function cargarDesdeSheets() {
+    if (!GS_URL) {
+        alert('️ Primero conecta tu Google Sheet');
+        return;
+    }
+    cambiarEstadoGS('cargando', 'Cargando datos...');
+
+    try {
+        const res = await fetch(GS_URL + '?action=load');
+        const data = await res.json();
+        
+        if (data.success) {
+            DB = data.data;
+            
+            if (DB.config) {
+                document.getElementById('tasaBCV').value = DB.config.TasaBCV || 0;
+                document.getElementById('nombreNegocio').value = DB.config.NombreNegocio || '';
+                document.getElementById('saldoBinance').value = DB.config.SaldoBinance_USD || 0;
+                document.getElementById('saldoEmpresa').value = DB.config.SaldoEmpresa_USD || 0;
+                document.getElementById('saldoPersonal').value = DB.config.SaldoPersonal_USD || 0;
+            }
+            
+            guardarEnLocalStorage();
+            renderizarIngresos();
+            renderizarRecordatorios();
+            renderizarDeudas();
+            renderizarEmpleados();
+            renderizarHistorialNomina();
+            actualizarDashboard();
+            actualizarListaProveedores();
+            
+            cambiarEstadoGS('conectado');
+            alert('✅ Datos cargados desde Google Sheets correctamente');
+        } else {
+            cambiarEstadoGS('error', data.error || 'Error al cargar');
+        }
+    } catch (err) {
+        cambiarEstadoGS('error', err.message);
+        alert('❌ Error al conectar: ' + err.message);
+    }
+}
+
+async function guardarEnSheets() {
+    if (!GS_URL) {
+        alert('⚠️ Primero conecta tu Google Sheet');
+        return;
+    }
+    cambiarEstadoGS('cargando', 'Guardando en la nube...');
+
+    try {
+        await fetch(GS_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'save',
+                data: DB
+            })
+        });
+        
+        cambiarEstadoGS('conectado');
+        alert('✅ Datos guardados en Google Sheets correctamente');
+    } catch (err) {
+        cambiarEstadoGS('error', err.message);
+        alert(' Error al guardar: ' + err.message);
+    }
+}
